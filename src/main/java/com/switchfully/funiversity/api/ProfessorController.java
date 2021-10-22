@@ -8,17 +8,23 @@ import com.switchfully.funiversity.domain.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping(path = "/professors")
 public class ProfessorController {
 
 
     /*
     Edge cases:
         -What if, when update, only one variable is mentionned/changed in the RequestBody?
+
+    Exceptions:
+        -Professor (byId) not found! in get, put and delete
 
      */
 
@@ -59,11 +65,19 @@ public class ProfessorController {
     @GetMapping(path = "/{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     ProfessorDto getProfessor(@PathVariable String id) {
-        //get by id from repo
-        Professor professor = repository.get(id);
-        //map to dto
-        //return dto
-        return mapToProfessorDto(professor);
+
+        try {
+            //get by id from repo
+            Professor professor = repository.get(id);
+
+            //map to dto
+            //return dto
+            return mapToProfessorDto(professor);
+        } catch (NullPointerException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The provided id " + id + " does not exist in the database.", exception);
+        }
+
+
     }
 
     @PutMapping(path = "/{id}", produces = "application/json", consumes = "application/json")
@@ -94,4 +108,9 @@ public class ProfessorController {
                 .setFirstname(professor.getFirstname())
                 .setLastname(professor.getLastname());
     }
+/*
+    @ExceptionHandler(NotFoundException.class)
+    protected void professorNotFoundException(NotFoundException e, HttpServletResponse response) throws IOException {
+        response.sendError(BAD_REQUEST.value(), e.getMessage());
+    }*/
 }
