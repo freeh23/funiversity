@@ -34,7 +34,7 @@ public class ProfessorService {
         );
         //save in repo
         repository.save(professor);
-        logger.info("Professor object succesfully added to the database.");
+        logger.info("Professor object successfully added to the database.");
         //return a Dto
         return mapToProfessorDto(professor);
     }
@@ -52,16 +52,11 @@ public class ProfessorService {
 
     public ProfessorDto getProfessor(String id) {
         //TODO dubbelcheck
-        try {
-            //get by id from repo
-            Professor professor = repository.get(id);
-            //map to dto
-            //return dto
+        if (contains(id)) {
             logger.info("Match found for given id in database.");
-            return mapToProfessorDto(professor);
-        } catch (NullPointerException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The provided id " + id + " does not exist in the database.", exception);
         }
+            Professor professor = repository.get(id);
+            return mapToProfessorDto(professor);
     }
 
     public ProfessorDto updateProfessor(String id, UpdateProfessorDto updateProfessorDto) {
@@ -84,6 +79,13 @@ public class ProfessorService {
         logger.info("Deleted: " + professor.toString());
         //return dto
         return mapToProfessorDto(professor);
+    }
+
+    private boolean contains(String id) {
+        if (!repository.contains(id)) {
+            throw new IllegalArgumentException(id + " does not exist as an ID in the database.");
+        }
+        return true;
     }
 
 

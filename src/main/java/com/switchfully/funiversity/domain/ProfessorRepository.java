@@ -31,4 +31,8 @@ public class ProfessorRepository {
         return repository.remove(id);
 
     }
+
+    public boolean contains(String id) {
+        return repository.containsKey(id);
+    }
 }
